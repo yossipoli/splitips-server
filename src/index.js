@@ -5,7 +5,8 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 
-import { register , checkCookie, login ,forgotPassword , resetPassword, changePassword, getUsers } from "./middleWares.js";
+// import { register , checkCookie, login ,forgotPassword , resetPassword, changePassword, getUsers } from "./middleWares.js";
+import { getAllUsers, getUser, register } from "./middleWares.js";
 
 const PORT = process.env.SERVER_PORT;
 
@@ -15,12 +16,20 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-app.post('/register', register, (req, res)=>{
-    res.send("Registered")
+// app.post('/register', register, (req, res)=>{
+//     res.send("Registered")
+// })
+
+app.get('/users', getAllUsers, (req, res)=> {
+    res.send(req.users)
 })
 
-app.get('/users', getUsers, (req, res)=> {
-    res.send("YAY!")
+app.post('/user', getUser, (req, res)=> {
+    res.send(req.user)
+})
+
+app.post('/register', register,  (req, res)=> {
+    res.send('Register successfully..')
 })
 
 // app.post('/register', register, (req, res)=>{
