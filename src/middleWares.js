@@ -6,7 +6,7 @@ import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 
 // import { getData, getUserId, getDataByParameter, insertData, updateDataByParameter } from './DataRequests.js';
-import { getUsers, getUserByEmail, getUserById, signUp } from './DataRequests.js';
+import * as Request from './DataRequests.js';
 import { encrypt, decrypt , hash , compare } from './crypt.js';
 
 import nodemailer from 'nodemailer'
@@ -29,7 +29,7 @@ app.use(cookieParser());
 
 export const getAllUsers = async (req, res, next) => {
     try {
-        const users = await getUsers()
+        const users = await Request.getUsers()
         req.users = users
         next()
     } catch {
@@ -41,9 +41,9 @@ export const getUser = async (req, res, next) => {
     try {
         let user = null
         if (req.body.id){
-            user = await getUserById(req.body.id)
+            user = await Request.getUserById(req.body.id)
         } else if (req.body.email) {
-            user = await getUserByEmail(req.body.email)
+            user = await Request.getUserByEmail(req.body.email)
         }
         req.user = user
         next()
@@ -54,7 +54,7 @@ export const getUser = async (req, res, next) => {
 
 export const register = async (req, res, next) => {
     try {
-        const user = await getUserByEmail(req.body.email)
+        const user = await Request.getUserByEmail(req.body.email)
         if (user) res.send("This Email already assign")
         else {
             await signUp(req.body.email, await hash(req.body.password))   
