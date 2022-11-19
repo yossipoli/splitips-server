@@ -4,10 +4,14 @@ dotenv.config();
 import express from 'express';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
+import session from 'express-session'
 
-import { register , checkCookie, login ,forgotPassword , resetPassword, changePassword, getUsers } from "./middleWares.js";
+// import { register , checkCookie, login ,forgotPassword , resetPassword, changePassword, getUsers } from "./middleWares.js";
+import * as MW from "./middleWares.js";
 
 const PORT = process.env.SERVER_PORT;
+
+const YEAR = 1000*60*60*24*365
 
 const app = express();
 
@@ -15,43 +19,47 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-app.post('/register', register, (req, res)=>{
-    res.send("Registered")
+app.use(session({
+    secret: process.env.SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: true, maxAge: YEAR}
+  }))
+
+app.get('/users', MW.getAllUsers, (req, res)=> {
+    res.send(req.users)
 })
 
-app.get('/users', getUsers, (req, res)=> {
-    res.send("YAY!")
+app.post('/user', MW.getUser, (req, res)=> {
+    res.send(req.user)
 })
 
-// app.post('/register', register, (req, res)=>{
-//     res.send("Registered")
-// })
+app.post('/register', MW.register,  (req, res)=> {
+    res.cookie("user", req.encryptUserId, {maxAge: YEAR})
+    res.send('Register successful')
+})
 
-// app.post('/login', login , (req, res)=>{
-//     res.cookie("user", req.encryptUserId, {maxAge: 1000*60*60*24*365}) //one year expire
-//     res.send(`${req.body.email} is login now!`)
-// })
+app.post('/login', MW.login , (req, res)=>{
+    res.cookie("user", req.encryptUserId, {maxAge: YEAR})
+    res.send(`${req.body.email} is login now!`)
+})
 
-// app.post('/forgot-password/', forgotPassword, (req, res)=>{
-//     res.send("reset-password request sent to your mail")
-// })
-
-// app.post('/reset-password/:id', resetPassword, (req, res)=>{
-//     res.send("You changed your old password for a new one")
-// })
-
-// app.get('/orders', checkCookie , (req, res)=>{
-//     res.send("You can see the orders")
-// })
-
-// app.get("/logout", checkCookie, (req, res) => {
-//     res.clearCookie("connect.sid");
-//     res.clearCookie("user");
-//     res.send(`logout has successful!`);
-// });
-
-app.get("/", (req, res)=> {
-    res.send("Hello World");
+app.get("/logout", MW.checkCookie, (req, res) => {
+    res.clearCookie("connect.sid");
+    res.clearCookie("user");
+    res.send(`logout has successful!`);
 });
+
+app.post('/forgot-password/', MW.forgotPassword, (req, res)=>{
+    res.send("reset-password request sent to your mail")
+})
+
+app.post('/reset-password/:id', MW.resetPassword, (req, res)=>{
+    res.send("You changed your old password for a new one")
+})
+
+app.get('/orders', MW.checkCookie , (req, res)=>{
+    res.send("You can see the orders")
+})
 
 app.listen(PORT, () => console.log(`Server is UP!🚀`));
