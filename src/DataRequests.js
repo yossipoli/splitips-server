@@ -16,6 +16,8 @@ con.connect((err) =>
         : console.log("connected to DB")
 );
 
+//users:
+
 export const getUsers = () => {
     return new Promise((resolve, reject) => {
         con.query(`SELECT * FROM users`, (err, data) => {
@@ -65,6 +67,12 @@ export const signUp = (email, password) => {
     });
 };
 
+export const set = (table, parameter, parameterValue, fieldToChange, newValue)=> {
+    con.query(`UPDATE ${table} SET ${fieldToChange} = ? WHERE (${parameter} = ?);`,[newValue, parameterValue])
+}
+
+//jobs:
+
 // export const getData = (table)=> {
 //     return new Promise((resolve, reject)=>{
 //         con.query(`SELECT * FROM ${table};` , (error, data)=>{
@@ -73,19 +81,6 @@ export const signUp = (email, password) => {
 //                 reject(null)
 //             } else {
 //                 resolve(data)
-//             }
-//         })
-//     })
-// }
-
-// export const getUserId = (email) => {
-//     return new Promise((resolve, reject)=> {
-//         con.query(`SELECT * FROM users WHERE email = ?`, [email], (error, userId)=> {
-//             if (error) {
-//                 console.log(`Can NOT search user ID by email \n ${error}`)
-//                 reject(-1)
-//             } else {
-//                 resolve(userId)
 //             }
 //         })
 //     })
@@ -103,10 +98,6 @@ export const signUp = (email, password) => {
 //             }
 //         })
 //     })
-// }
-
-// export const updateDataByParameter = (table, parameter, parameterValue, fieldToChange, newValue)=> {
-//     con.query(`UPDATE ${table} SET ${fieldToChange} = ? WHERE (${parameter} = ?);`,[newValue, parameterValue])
 // }
 
 // export const insertData = (table, values)=> {
