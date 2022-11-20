@@ -55,7 +55,7 @@ export const signUp = (email, password) => {
 };
 
 export const set = (table, parameter, parameterValue, fieldToChange, newValue)=> {
-    con.query(`UPDATE ${table} SET (${fieldToChange} = ?) WHERE (${parameter} = ?);`,[newValue, parameterValue])
+    con.query(`UPDATE ${table} SET ${fieldToChange} = ? WHERE (${parameter} = ?);`,[newValue, parameterValue])
 }
 
 //jobs:

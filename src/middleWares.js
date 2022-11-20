@@ -8,17 +8,7 @@ import cookieParser from 'cookie-parser';
 import * as Request from './DataRequests.js';
 import { encrypt, decrypt , hash , compare } from './crypt.js';
 
-import nodemailer from 'nodemailer'
-
-const transform = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: +process.env.EMAIL_PORT,
-    secure: true,
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD
-    }
-})
+import { sendMail } from './mailer.js';
 
 const app = express();
 
@@ -53,61 +43,14 @@ export const getUser = async (req, res, next) => {
 
 export const register = async (req, res, next) => {
     try {
-        const user = await Request.getUser("email", req.body.email)
+        let user = await Request.getUser("email", req.body.email)
         if (user) res.send("This Email already assign")
         else {
             await Request.signUp(req.body.email, await hash(req.body.password))
             req.session.cookie
+            user = await Request.getUser("email", req.body.email)
 
-            let details = {
-                from: process.env.EMAIL_USER,
-                to: `${user.email}`,
-                subject: "Welcome to $pliTip$",
-                text: `Account activation`,
-                html: /*html*/`
-                <html>
-                <head>
-                    <style>
-                        .logo h1{
-                            font-size: 2.5rem;
-                            text-shadow: 1px 1px 10px green;
-                            font-family: 'ariel';
-                        }
-
-                        .logo .dollar{
-                            color: green;
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div className="logo">
-                        <h1>
-                            
-                            Tip
-                            <span className="dollar">$</span>
-                            pliT
-                            
-                        </h1>
-                    </div>
-                    <div>
-                    Welcome to $pliTip$, <br>
-                    The easy way for manage the waiters salary and tips.
-                    </div>
-                    <div>
-                    Click <a href="http://localhost:${process.env.PORT}/activate/${encrypt(user.id)}">here</a> for activate your account.
-                    </div>
-                    </body>
-                    </html>
-                    `
-                }
-                
-                transform.sendMail(details, (err)=>{
-                    if(err) console.log("Failed to send mail: ", err)
-                    else{
-                    console.log("email has sent!")
-                }
-            })
-
+            sendMail(user.email, "activate" , encrypt(user.id))
             next()
         }
     } catch {
@@ -164,50 +107,7 @@ export const forgotPassword = async (req, res, next) => {
         const user = await Request.getUser("email", req.body.email);
         if (!user) res.status(201).send("This email is not exist in the system");
         else {
-            // const transform = nodemailer.createTransport(emailConfig)
-
-            let details = {
-                from: process.env.EMAIL_USER,
-                to: `${req.body.email}`,
-                subject: "$pliTip$ - Reset password request!",
-                text: `Reset Password`,
-                html: /*html*/`
-                <html>
-                <head>
-                    <style>
-                        .logo h1{
-                            font-size: 2.5rem;
-                            text-shadow: 1px 1px 10px green;
-                            font-family: 'ariel';
-                        }
-
-                        .logo .dollar{
-                            color: green;
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div className="logo">
-                        <h1>
-                            
-                            Tip
-                            <span className="dollar">$</span>
-                            pliT
-                            
-                        </h1>
-                    </div>
-                    Click <a href="http://localhost:${process.env.PORT}/reset-password/${encrypt(user.id)}">here</a> for reset your password.
-                </body>
-                </html>
-                `
-            }
-            
-            transform.sendMail(details, (err)=>{
-                if(err) console.log("Failed to send mail: ", err)
-                else{
-                    console.log("Email for reset password has sent!")
-                }
-            })
+            sendMail( req.body.email, "reset-password" , encrypt(user.id) )
             next();
         }
     } catch{
