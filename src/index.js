@@ -39,6 +39,10 @@ app.post('/register', MW.register,  (req, res)=> {
     res.send('Register successful')
 })
 
+app.get('/activate/:id', MW.activation, (req,res)=> {
+    res.send("Active!")
+})
+
 app.post('/login', MW.login , (req, res)=>{
     res.cookie("user", req.encryptUserId, {maxAge: YEAR})
     res.send(`${req.body.email} is login now!`)

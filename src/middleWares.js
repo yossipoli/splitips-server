@@ -12,7 +12,7 @@ import nodemailer from 'nodemailer'
 
 const transform = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
-    port: process.env.EMAIL_PORT,
+    port: +process.env.EMAIL_PORT,
     secure: true,
     auth: {
         user: process.env.EMAIL_USER,
@@ -58,10 +58,68 @@ export const register = async (req, res, next) => {
         else {
             await Request.signUp(req.body.email, await hash(req.body.password))
             req.session.cookie
+
+            let details = {
+                from: process.env.EMAIL_USER,
+                to: `${user.email}`,
+                subject: "Welcome to $pliTip$",
+                text: `Account activation`,
+                html: /*html*/`
+                <html>
+                <head>
+                    <style>
+                        .logo h1{
+                            font-size: 2.5rem;
+                            text-shadow: 1px 1px 10px green;
+                            font-family: 'ariel';
+                        }
+
+                        .logo .dollar{
+                            color: green;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div className="logo">
+                        <h1>
+                            
+                            Tip
+                            <span className="dollar">$</span>
+                            pliT
+                            
+                        </h1>
+                    </div>
+                    <div>
+                    Welcome to $pliTip$, <br>
+                    The easy way for manage the waiters salary and tips.
+                    </div>
+                    <div>
+                    Click <a href="http://localhost:${process.env.PORT}/activate/${encrypt(user.id)}">here</a> for activate your account.
+                    </div>
+                    </body>
+                    </html>
+                    `
+                }
+                
+                transform.sendMail(details, (err)=>{
+                    if(err) console.log("Failed to send mail: ", err)
+                    else{
+                    console.log("email has sent!")
+                }
+            })
+
             next()
         }
     } catch {
         res.status(401).send("Failed to register.")
+    }
+}
+
+export const activation = async (req, res, next) => {
+    const user = await Request.getUser("id", decrypt(req.params.id))
+    if (!user) res.status(201).send("User ID doesn't exist")
+    else{
+        Request.set("users", "id", `${user.id}` , "activate", 1)
     }
 }
 
@@ -109,15 +167,36 @@ export const forgotPassword = async (req, res, next) => {
             // const transform = nodemailer.createTransport(emailConfig)
 
             let details = {
-                from: "yossipoli@gmail.com",
+                from: process.env.EMAIL_USER,
                 to: `${req.body.email}`,
-                subject: "Reset password request?!",
-                text: `Click at the link for create a new password-> http://localhost:${3100}/reset-password/${req.encryptUserId}/${req.token}`,
+                subject: "$pliTip$ - Reset password request!",
+                text: `Reset Password`,
                 html: /*html*/`
                 <html>
-                <head></head>
+                <head>
+                    <style>
+                        .logo h1{
+                            font-size: 2.5rem;
+                            text-shadow: 1px 1px 10px green;
+                            font-family: 'ariel';
+                        }
+
+                        .logo .dollar{
+                            color: green;
+                        }
+                    </style>
+                </head>
                 <body>
-                    Click <a href="http://localhost:${3100}/reset-password/${encrypt(user.id)}">here</a> for create a new password
+                    <div className="logo">
+                        <h1>
+                            
+                            Tip
+                            <span className="dollar">$</span>
+                            pliT
+                            
+                        </h1>
+                    </div>
+                    Click <a href="http://localhost:${process.env.PORT}/reset-password/${encrypt(user.id)}">here</a> for reset your password.
                 </body>
                 </html>
                 `
@@ -126,7 +205,7 @@ export const forgotPassword = async (req, res, next) => {
             transform.sendMail(details, (err)=>{
                 if(err) console.log("Failed to send mail: ", err)
                 else{
-                    console.log("email has sent!")
+                    console.log("Email for reset password has sent!")
                 }
             })
             next();
@@ -138,7 +217,7 @@ export const forgotPassword = async (req, res, next) => {
 
 export const changePassword = async (req, user)=> {
     const hashedPassword = await hash(req.body.password)
-    set("users", "id", `${user.id}` , "password", `${hashedPassword}`)
+    Request.set("users", "id", `${user.id}` , "password", `${hashedPassword}`)
 }
 
 export const resetPassword = async (req, res, next)=> {
