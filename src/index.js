@@ -23,7 +23,7 @@ app.use(session({
     secret: process.env.SECRET,
     resave: false,
     saveUninitialized: true,
-    // cookie: { secure: true, maxAge: YEAR}
+    cookie: { /*secure: true,*/ maxAge: YEAR}
   }))
 
   //////////////////////////////////////////////////////////////////////
