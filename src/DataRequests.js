@@ -44,9 +44,8 @@ export const getUser = (where, value) => {
 
 export const signUp = (email, password) => {
     return new Promise((resolve, reject) => {
-        con.query(`INSERT INTO users VALUES (default, ?, ?)`, [email, password], (err, data) => {
+        con.query(`INSERT INTO users VALUES (default, ?, ?, 0)`, [email, password], (err) => {
             if (err) {
-                console.log("BAlaGan");
                 reject(err);
             } else {
                 resolve(true);
@@ -89,6 +88,5 @@ export const set = (table, parameter, parameterValue, fieldToChange, newValue)=>
 // }
 
 // export const insertData = (table, values)=> {
-//     console.log("insert");
 //     con.query(`INSERT INTO ? VALUES (?);`, [table, values])
 // }

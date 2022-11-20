@@ -19,6 +19,7 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 app.use(session({
+    name: "sessionCookie",
     secret: process.env.SECRET,
     resave: false,
     saveUninitialized: true,
@@ -43,11 +44,11 @@ app.post('/login', MW.login , (req, res)=>{
     res.send(`${req.body.email} is login now!`)
 })
 
-app.get('check-cookie', MW.checkCookie , (req, res)=>{
-    res.send("true")
+app.get('/check-cookie', MW.checkCookie , (req, res)=>{
+    res.send(true)
 })
 
-app.get("/logout", MW.checkCookie, (req, res) => {
+app.get("/logout", (req, res) => {
     res.clearCookie("connect.sid");
     res.clearCookie("user");
     res.send(`logout has successful!`);
