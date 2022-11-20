@@ -1,20 +1,15 @@
 import * as dotenv from 'dotenv'
 dotenv.config();
 
-import express from 'express';
-import bodyParser from 'body-parser';
-import cookieParser from 'cookie-parser';
-
 import * as Request from './DataRequests.js';
 import { encrypt, decrypt , hash , compare } from './crypt.js';
-
 import { sendMail } from './mailer.js';
 
-const app = express();
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-app.use(cookieParser());
+  //////////////////////////////////////////////////////////////////////
+  ///////////////////////////// user funcs /////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+
 
 // export const getAllUsers = async (req, res, next) => {
 //     try {
@@ -129,3 +124,10 @@ export const resetPassword = async (req, res, next)=> {
         next()
     }
 }
+
+
+  //////////////////////////////////////////////////////////////////////
+  ///////////////////////////// jobs funcs /////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+
+  

@@ -26,9 +26,13 @@ app.use(session({
     // cookie: { secure: true, maxAge: YEAR}
   }))
 
-// app.get('/users', MW.getAllUsers, (req, res)=> {
-//     res.send(req.users)
-// })
+  //////////////////////////////////////////////////////////////////////
+  ///////////////////////////// user routs /////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  
+  // app.get('/users', MW.getAllUsers, (req, res)=> {
+  //     res.send(req.users)
+  // })
 
 app.post('/user', MW.getUser, (req, res)=> {
     res.send(req.user)
@@ -64,7 +68,14 @@ app.post('/forgot-password/', MW.forgotPassword, (req, res)=>{
 
 //need to send link for the web page with new password input
 app.post('/reset-password/:id', MW.resetPassword, (req, res)=>{
-    res.send("You changed your old password for a new one")
+    res.send("You changed your password")
 })
+
+
+//////////////////////////////////////////////////////////////////////
+///////////////////////////// jobs routs /////////////////////////////
+//////////////////////////////////////////////////////////////////////
+
+
 
 app.listen(PORT, () => console.log(`Server is UP!🚀`));
