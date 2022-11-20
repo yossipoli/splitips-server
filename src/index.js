@@ -53,17 +53,18 @@ app.get('/check-cookie', MW.checkCookie , (req, res)=>{
 })
 
 app.get("/logout", (req, res) => {
-    res.clearCookie("connect.sid");
+    res.clearCookie("sessionCookie");
     res.clearCookie("user");
     res.send(`logout has successful!`);
 });
 
-// app.post('/forgot-password/', MW.forgotPassword, (req, res)=>{
-//     res.send("reset-password request sent to your mail")
-// })
+app.post('/forgot-password/', MW.forgotPassword, (req, res)=>{
+    res.send("reset-password request sent to your mail")
+})
 
-// app.post('/reset-password/:id', MW.resetPassword, (req, res)=>{
-//     res.send("You changed your old password for a new one")
-// })
+//need to send link for the web page with new password input
+app.post('/reset-password/:id', MW.resetPassword, (req, res)=>{
+    res.send("You changed your old password for a new one")
+})
 
 app.listen(PORT, () => console.log(`Server is UP!🚀`));

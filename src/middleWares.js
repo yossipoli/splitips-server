@@ -63,6 +63,7 @@ export const activation = async (req, res, next) => {
     if (!user) res.status(201).send("User ID doesn't exist")
     else{
         Request.set("users", "id", `${user.id}` , "activate", 1)
+        next()
     }
 }
 
@@ -107,7 +108,7 @@ export const forgotPassword = async (req, res, next) => {
         const user = await Request.getUser("email", req.body.email);
         if (!user) res.status(201).send("This email is not exist in the system");
         else {
-            sendMail( req.body.email, "reset-password" , encrypt(user.id) )
+            sendMail( user.email, "reset-password" , encrypt(user.id) )
             next();
         }
     } catch{
