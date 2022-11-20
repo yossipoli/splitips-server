@@ -18,38 +18,25 @@ con.connect((err) =>
 
 //users:
 
-export const getUsers = () => {
+// export const getUsers = () => {
+//     return new Promise((resolve, reject) => {
+//         con.query(`SELECT * FROM users`, (err, data) => {
+//             if (err) {
+//                 reject(err);
+//             } else {
+//                 resolve(data);
+//             }
+//         });
+//     });
+// };
+
+export const getUser = (where, value) => {
     return new Promise((resolve, reject) => {
-        con.query(`SELECT * FROM users`, (err, data) => {
+        con.query(`SELECT * FROM users where (${where} = ?);`, [value], (err, data) => {
             if (err) {
                 reject(err);
             } else {
-                resolve(data);
-            }
-        });
-    });
-};
-
-export const getUserByEmail = (email) => {
-    return new Promise((resolve, reject) => {
-        con.query(`SELECT * FROM users where email = ?`, [email], (err, data) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(data[0] || null);
-                }
-            }
-        );
-    });
-};
-
-export const getUserById = (id) => {
-    return new Promise((resolve, reject) => {
-        con.query(`SELECT * FROM users where id = ?`, [id], (err, data) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(data[0] || null);
+                resolve(data[0]);
             }
         });
     });
@@ -57,7 +44,7 @@ export const getUserById = (id) => {
 
 export const signUp = (email, password) => {
     return new Promise((resolve, reject) => {
-        con.query(`INSERT INTO users VALUES(default, ?, ?)`, [email, password], (err, data) => {
+        con.query(`INSERT INTO users VALUES (default, ?, ?, 0)`, [email, password], (err) => {
             if (err) {
                 reject(err);
             } else {
@@ -101,6 +88,5 @@ export const set = (table, parameter, parameterValue, fieldToChange, newValue)=>
 // }
 
 // export const insertData = (table, values)=> {
-//     console.log("insert");
 //     con.query(`INSERT INTO ? VALUES (?);`, [table, values])
 // }

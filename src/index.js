@@ -6,7 +6,6 @@ import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import session from 'express-session'
 
-// import { register , checkCookie, login ,forgotPassword , resetPassword, changePassword, getUsers } from "./middleWares.js";
 import * as MW from "./middleWares.js";
 
 const PORT = process.env.SERVER_PORT;
@@ -20,15 +19,16 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 app.use(session({
+    name: "sessionCookie",
     secret: process.env.SECRET,
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: true, maxAge: YEAR}
+    // cookie: { secure: true, maxAge: YEAR}
   }))
 
-app.get('/users', MW.getAllUsers, (req, res)=> {
-    res.send(req.users)
-})
+// app.get('/users', MW.getAllUsers, (req, res)=> {
+//     res.send(req.users)
+// })
 
 app.post('/user', MW.getUser, (req, res)=> {
     res.send(req.user)
@@ -39,27 +39,31 @@ app.post('/register', MW.register,  (req, res)=> {
     res.send('Register successful')
 })
 
+app.get('/activate/:id', MW.activation, (req,res)=> {
+    res.send("Active!")
+})
+
 app.post('/login', MW.login , (req, res)=>{
     res.cookie("user", req.encryptUserId, {maxAge: YEAR})
     res.send(`${req.body.email} is login now!`)
 })
 
-app.get("/logout", MW.checkCookie, (req, res) => {
+app.get('/check-cookie', MW.checkCookie , (req, res)=>{
+    res.send(true)
+})
+
+app.get("/logout", (req, res) => {
     res.clearCookie("connect.sid");
     res.clearCookie("user");
     res.send(`logout has successful!`);
 });
 
-app.post('/forgot-password/', MW.forgotPassword, (req, res)=>{
-    res.send("reset-password request sent to your mail")
-})
+// app.post('/forgot-password/', MW.forgotPassword, (req, res)=>{
+//     res.send("reset-password request sent to your mail")
+// })
 
-app.post('/reset-password/:id', MW.resetPassword, (req, res)=>{
-    res.send("You changed your old password for a new one")
-})
-
-app.get('/orders', MW.checkCookie , (req, res)=>{
-    res.send("You can see the orders")
-})
+// app.post('/reset-password/:id', MW.resetPassword, (req, res)=>{
+//     res.send("You changed your old password for a new one")
+// })
 
 app.listen(PORT, () => console.log(`Server is UP!🚀`));
