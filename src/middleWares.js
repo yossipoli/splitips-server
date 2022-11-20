@@ -5,6 +5,7 @@ import * as Request from './DataRequests.js';
 import { encrypt, decrypt , hash , compare } from './crypt.js';
 import { sendMail } from './mailer.js';
 
+const YEAR = 1000*60*60*24*365
 
   //////////////////////////////////////////////////////////////////////
   ///////////////////////////// user funcs /////////////////////////////
@@ -42,7 +43,7 @@ export const register = async (req, res, next) => {
         if (user) res.send("This Email already assign")
         else {
             await Request.signUp(req.body.email, await hash(req.body.password))
-            req.session.cookie
+            res.cookie("user", encrypt(user.id), {maxAge: YEAR})
             user = await Request.getUser("email", req.body.email)
 
             sendMail(user.email, "activate" , encrypt(user.id))
@@ -71,8 +72,7 @@ export const login = async (req, res, next) => {
                 res.status(201).send("email or password is incorrect");
             }
             else {
-                req.session.cookie
-                req.encryptUserId = encrypt(user.id)
+                res.cookie("user", encrypt(user.id), {maxAge: YEAR})
                 next();
             }
         }
@@ -130,4 +130,4 @@ export const resetPassword = async (req, res, next)=> {
   ///////////////////////////// jobs funcs /////////////////////////////
   //////////////////////////////////////////////////////////////////////
 
-  
+
