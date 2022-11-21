@@ -42,7 +42,7 @@ export const getUser = (where, value) => {
     });
 };
 
-export const signUp = (email, password) => {
+export const register = (email, password) => {
     return new Promise((resolve, reject) => {
         con.query(`INSERT INTO users VALUES (default, ?, ?, 0)`, [email, password], (err) => {
             if (err) {
@@ -60,33 +60,71 @@ export const set = (table, parameter, parameterValue, fieldToChange, newValue)=>
 
 //jobs:
 
-// export const getData = (table)=> {
-//     return new Promise((resolve, reject)=>{
-//         con.query(`SELECT * FROM ${table};` , (error, data)=>{
-//             if (error){
-//                 console.log(`Failed to get data from DB: \n${error}`);
-//                 reject(null)
-//             } else {
-//                 resolve(data)
-//             }
-//         })
-//     })
+// export const insertData = (values)=> {
+//     con.query(`INSERT INTO jobs VALUES (?);`, [values])
 // }
 
-// export const getDataByParameter = (table, parameter, value)=> {
-//     return new Promise((resolve, reject)=>{
-//         con.query(`SELECT * FROM ${table} WHERE ${parameter}= ${value};`, (error, data)=>{
-//             if (error){
-//                 console.log(`Failed to get data from DB: \n${error}`);
-//                 reject(null)
-//             } else {
-//                 console.log("YES");
-//                 resolve(data[0] || null)
-//             }
-//         })
-//     })
-// }
+export const getData = (userId)=> {
+    return new Promise((resolve, reject)=>{
+        con.query(`SELECT * FROM jobs WHERE (user_id = ?);`, [userId] , (error, data)=>{
+            if (error){
+                console.log(`Failed to get data from DB: \n${error}`);
+                reject(error)
+            } else {
+                resolve(data)
+            }
+        })
+    })
+}
 
-// export const insertData = (table, values)=> {
-//     con.query(`INSERT INTO ? VALUES (?);`, [table, values])
-// }
+export const getDays = (userId, startDate, endDate = startDate)=> {
+    return new Promise((resolve, reject)=>{
+        con.query(`call show_days(?, ?, ?);`, [userId, startDate, endDate] , (error, data)=>{
+            if (error){
+                console.log(`Failed to get date data from DB: \n${error}`);
+                reject(error)
+            } else {
+                resolve(data[0] || null)
+            }
+        })
+    })
+
+}
+
+export const getEmployeePaycheck = (userId, employeeName, startDate, endDate = startDate)=> {
+    return new Promise((resolve, reject)=>{
+            con.query(`call splitips.show_employee_in_period(?, ?, ?, ?);`, [userId, startDate, endDate, employeeName] , (error, data)=>{
+            if (error){
+                console.log(`Failed to get employee paycheck from DB: \n${error}`);
+                reject(error)
+            } else {
+                resolve(data[0] || null)
+            }
+        })
+    })
+}
+
+
+export const addJob = (values)=> {
+    return new Promise((resolve, reject) => {
+        con.query(`INSERT INTO jobs VALUES (default, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, values, (err) => {
+            if (err) {
+                reject("addJob DataRequest failed", err);
+            } else {
+                resolve(true);
+            }
+        });
+    });
+}
+
+export const removeJob = (id) => {
+    return new Promise((resolve, reject) => {
+        con.query(`DELETE FROM jobs WHERE (id = ?);`, [id], (err) => {
+            if (err) {
+                reject("addJob DataRequest failed", err);
+            } else {
+                resolve(true);
+            }
+        });
+    });
+}
