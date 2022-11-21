@@ -23,7 +23,7 @@ app.use(session({
     secret: process.env.SECRET,
     resave: false,
     saveUninitialized: true,
-    // cookie: { secure: true, maxAge: YEAR}
+    cookie: { /*secure: true,*/ maxAge: YEAR}
   }))
 
   //////////////////////////////////////////////////////////////////////
@@ -74,6 +74,16 @@ app.post('/reset-password/:id', MW.resetPassword, (req, res)=>{
 ///////////////////////////// jobs routs /////////////////////////////
 //////////////////////////////////////////////////////////////////////
 
+app.post('/days', MW.getPayDate, (req, res)=> {
+    res.send(req.jobDays)
+})
 
+app.post('/paycheck', MW.getPaycheck, (req, res)=> {
+    res.send(req.paycheck)
+})
+
+app.post('/add', MW.addJob, (req, res)=> {
+    res.send("Job is added")
+})
 
 app.listen(PORT, () => console.log(`Server is UP!🚀`));
