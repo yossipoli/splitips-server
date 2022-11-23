@@ -66,10 +66,10 @@ export const activation = async (req, res, next) => {
 export const login = async (req, res, next) => {
     try {
         const user = await Request.getUser("email", req.body.email);
-        if (!user) res.status(201).send("email or password is incorrect");
+        if (!user) res.status(201).send(false);
         else {
             if (! await compare(req.body.password, user.password)){
-                res.status(201).send("email or password is incorrect");
+                res.status(201).send(false);
             }
             else {
                 res.cookie("user", encrypt(user.id), {maxAge: YEAR})
@@ -77,7 +77,7 @@ export const login = async (req, res, next) => {
             }
         }
     } catch {
-        res.status(401).send("Failed to login.")
+        res.status(401).send(false)
     }
 }
 

@@ -2,10 +2,10 @@ import * as dotenv from 'dotenv'
 dotenv.config();
 
 import express from 'express';
+import cors from 'cors'
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import session from 'express-session'
-
 import * as MW from "./middleWares.js";
 
 const PORT = process.env.SERVER_PORT;
@@ -14,6 +14,13 @@ const YEAR = 1000*60*60*24*365
 
 const app = express();
 
+const corsOptions = {
+    credentials: true,
+	origin: 'http://localhost:3000',
+	optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
@@ -47,7 +54,7 @@ app.get('/activate/:id', MW.activation, (req,res)=> {
 })
 
 app.post('/login', MW.login , (req, res)=>{
-    res.send(`${req.body.email} is login now!`)
+    res.send(true)
 })
 
 app.get('/check-cookie', MW.checkCookie , (req, res)=>{
