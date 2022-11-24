@@ -68,12 +68,13 @@ app.get("/logout", (req, res) => {
 });
 
 app.post('/forgot-password/', MW.forgotPassword, (req, res)=>{
-    res.send("reset-password request sent to your mail")
+    res.send({res: "success"})
 })
 
 //need to send link for the web page with new password input
 app.post('/reset-password/:id', MW.resetPassword, (req, res)=>{
-    res.send("You changed your password")
+    console.log("reset");
+    res.send({res: "success"})
 })
 
 

@@ -40,10 +40,10 @@ export const getUser = async (req, res, next) => {
 export const register = async (req, res, next) => {
     try {
         let user = await Request.getUser("email", req.body.email)
-        if (user) res.send({res: "wrong"})
+        if (user) res.send({res: "wrong"}) //This email is already in the system
         else {
             const respond = await Request.register(req.body.email, await hash(req.body.password))
-            if (!respond) res.send({res: "fail"})
+            if (!respond) res.send({res: "fail"}) //failed to insert new data
             user = await Request.getUser("email", req.body.email)
             sendMail(user.email, "activate" , encrypt(user.id))
             res.cookie("user", encrypt(user.id), {maxAge: YEAR})
@@ -66,10 +66,10 @@ export const activation = async (req, res, next) => {
 export const login = async (req, res, next) => {
     try {
         const user = await Request.getUser("email", req.body.email);
-        if (!user) res.status(201).send({res: "wrong"});
+        if (!user) res.status(201).send({res: "wrong"}); //This email is not exist in the system
         else {
             if (! await compare(req.body.password, user.password)){
-                res.status(201).send({res: "wrong"});
+                res.status(201).send({res: "wrong"}); //Incorrect password
             }
             else {
                 res.cookie("user", encrypt(user.id), {maxAge: YEAR})
@@ -101,13 +101,13 @@ export const checkCookie = async (req, res, next)=> {
 export const forgotPassword = async (req, res, next) => {
     try{
         const user = await Request.getUser("email", req.body.email);
-        if (!user) res.status(201).send("This email is not exist in the system");
+        if (!user) res.status(201).send({res: "wrong"}); //This email is not exist in the system
         else {
-            sendMail( user.email, "reset-password" , encrypt(user.id) )
+            sendMail( user.email, "reset-password" , encrypt(user.id) , true )
             next();
         }
     } catch{
-        console.log("Failed to get user")
+        console.log({res: "fail"})
     }
 }
 
@@ -118,7 +118,7 @@ export const changePassword = async (req, user)=> {
 
 export const resetPassword = async (req, res, next)=> {
     const user = await Request.getUser("id", decrypt(req.params.id))
-    if (!user) res.status(201).send("User ID doesn't exist")
+    if (!user) res.status(201).send({res: "wrong"}) //"User ID doesn't exist"
     else{
         changePassword(req, user)
         next()
