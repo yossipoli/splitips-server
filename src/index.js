@@ -1,12 +1,16 @@
 import * as dotenv from 'dotenv'
 dotenv.config();
 
+import path from 'path';
 import express from 'express';
 import cors from 'cors'
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import session from 'express-session'
 import * as MW from "./middleWares.js";
+import { readFile } from 'fs';
+
+const __dirname = path.resolve();
 
 const PORT = process.env.SERVER_PORT;
 
@@ -91,5 +95,19 @@ app.post('/paycheck', MW.getPaycheck, (req, res)=> {
 app.post('/add', MW.addJob, (req, res)=> {
     res.send("Job is added")
 })
+
+//////////////////////////////////////////////////////////////////////
+/////////////////////////////// others ///////////////////////////////
+//////////////////////////////////////////////////////////////////////
+
+app.get('./logoTitle.png', (req, res) => {
+    readFile(__dirname +'/imgs/logoTitle.png', { 'content-type': 'image/png' } , (e, img) => {
+        if (e) {
+            res.send('TipSplit');
+        } else {
+            res.send(img);
+        }
+    })
+});
 
 app.listen(PORT, () => console.log(`Server is UP!🚀`));

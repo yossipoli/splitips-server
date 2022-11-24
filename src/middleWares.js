@@ -117,11 +117,15 @@ export const changePassword = async (req, user)=> {
 }
 
 export const resetPassword = async (req, res, next)=> {
-    const user = await Request.getUser("id", decrypt(req.params.id))
-    if (!user) res.status(201).send({res: "wrong"}) //"User ID doesn't exist"
-    else{
-        changePassword(req, user)
-        next()
+    try{
+        const user = await Request.getUser("id", decrypt(req.params.id))
+        if (!user) res.status(201).send({res: "wrong"}) //"User ID doesn't exist"
+        else{
+            changePassword(req, user)
+            next()
+        }
+    } catch {
+        res.status(201).send({res: "fail"}) //"User ID doesn't exist"
     }
 }
 
