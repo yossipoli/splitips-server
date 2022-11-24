@@ -40,17 +40,17 @@ export const getUser = async (req, res, next) => {
 export const register = async (req, res, next) => {
     try {
         let user = await Request.getUser("email", req.body.email)
-        if (user) res.send("This Email already assign")
+        if (user) res.send({res: "wrong"})
         else {
-            await Request.register(req.body.email, await hash(req.body.password))
-            res.cookie("user", encrypt(user.id), {maxAge: YEAR})
+            const respond = await Request.register(req.body.email, await hash(req.body.password))
+            if (!respond) res.send({res: "fail"})
             user = await Request.getUser("email", req.body.email)
-
             sendMail(user.email, "activate" , encrypt(user.id))
+            res.cookie("user", encrypt(user.id), {maxAge: YEAR})
             next()
         }
     } catch {
-        res.status(401).send("Failed to register.")
+        res.status(401).send({res: "fail"})
     }
 }
 
@@ -66,10 +66,10 @@ export const activation = async (req, res, next) => {
 export const login = async (req, res, next) => {
     try {
         const user = await Request.getUser("email", req.body.email);
-        if (!user) res.status(201).send(false);
+        if (!user) res.status(201).send({res: "wrong"});
         else {
             if (! await compare(req.body.password, user.password)){
-                res.status(201).send(false);
+                res.status(201).send({res: "wrong"});
             }
             else {
                 res.cookie("user", encrypt(user.id), {maxAge: YEAR})
@@ -77,7 +77,7 @@ export const login = async (req, res, next) => {
             }
         }
     } catch {
-        res.status(401).send(false)
+        res.status(401).send({res: "fail"})
     }
 }
 

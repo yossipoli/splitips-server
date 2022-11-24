@@ -46,7 +46,7 @@ app.post('/user', MW.getUser, (req, res)=> {
 })
 
 app.post('/register', MW.register,  (req, res)=> {
-    res.send('Register successful')
+    res.send({res: "success"})
 })
 
 app.get('/activate/:id', MW.activation, (req,res)=> {
@@ -54,7 +54,7 @@ app.get('/activate/:id', MW.activation, (req,res)=> {
 })
 
 app.post('/login', MW.login , (req, res)=>{
-    res.send(true)
+    res.send({res: "success"})
 })
 
 app.get('/check-cookie', MW.checkCookie , (req, res)=>{

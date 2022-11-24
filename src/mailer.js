@@ -46,7 +46,7 @@ import { createTransport } from "nodemailer";
             console.log("Failed to send mail: ", err);
         }
         else {
-            console.log("email has sent!");
+            console.log("Email has sent successfully!");
         }
     });
 
