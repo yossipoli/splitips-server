@@ -50,7 +50,7 @@ app.post('/user', MW.getUser, (req, res)=> {
 })
 
 app.post('/register', MW.register,  (req, res)=> {
-    res.send({res: "success"})
+    res.send({sign: "success", msg: "נרשמת למערכת בהצלחה"})
 })
 
 app.get('/activate/:id', MW.activation, (req,res)=> {
@@ -58,7 +58,7 @@ app.get('/activate/:id', MW.activation, (req,res)=> {
 })
 
 app.post('/login', MW.login , (req, res)=>{
-    res.send({res: "success"})
+    res.send({sign: "success", msg: "התחברת למערכת בהצלחה"})
 })
 
 app.get('/check-cookie', MW.checkCookie , (req, res)=>{
@@ -72,11 +72,11 @@ app.get("/logout", (req, res) => {
 });
 
 app.post('/forgot-password/', MW.forgotPassword, (req, res)=>{
-    res.send({res: "success"})
+    res.send({sign: "info", msg: "נשלחה לכותבת המייל שלך בקשה לאיפוס סיסמה"})
 })
 
 app.post('/reset-password/:id', MW.resetPassword, (req, res)=>{
-    res.send({res: "success"})
+    res.send({sign: "success", msg: "הסיסמה שלך שונתה בהצלחה"})
 })
 
 
@@ -93,7 +93,7 @@ app.post('/paycheck', MW.getPaycheck, (req, res)=> {
 })
 
 app.post('/add', MW.addJob, (req, res)=> {
-    res.send("Job is added")
+    res.send({sign: "info", msg: "המידע נשמר"})
 })
 
 //////////////////////////////////////////////////////////////////////

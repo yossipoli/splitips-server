@@ -40,17 +40,17 @@ export const getUser = async (req, res, next) => {
 export const register = async (req, res, next) => {
     try {
         let user = await Request.getUser("email", req.body.email)
-        if (user) res.send({res: "wrong"}) //This email is already in the system
+        if (user) res.send({sign: "warning", msg: "כתובת אימייל זו כבר רשומה במערכת"})
         else {
             const respond = await Request.register(req.body.email, await hash(req.body.password))
-            if (!respond) res.send({res: "fail"}) //failed to insert new data
+            if (!respond) res.send({sign: "error", msg: "אירעה שגיאה"})
             user = await Request.getUser("email", req.body.email)
             sendMail(user.email, "activate" , encrypt(user.id))
             res.cookie("user", encrypt(user.id), {maxAge: YEAR})
             next()
         }
     } catch {
-        res.status(401).send({res: "fail"})
+        res.status(401).send({sign: "error", msg: "אירעה שגיאה"})
     }
 }
 
@@ -66,10 +66,10 @@ export const activation = async (req, res, next) => {
 export const login = async (req, res, next) => {
     try {
         const user = await Request.getUser("email", req.body.email);
-        if (!user) res.status(201).send({res: "wrong"}); //This email is not exist in the system
+        if (!user) res.status(201).send({sign: "warning", msg: "אימייל או סיסמה לא נכונים"});
         else {
             if (! await compare(req.body.password, user.password)){
-                res.status(201).send({res: "wrong"}); //Incorrect password
+                res.status(201).send({sign: "warning", msg: "אימייל או סיסמה לא נכונים"});
             }
             else {
                 res.cookie("user", encrypt(user.id), {maxAge: YEAR})
@@ -77,7 +77,7 @@ export const login = async (req, res, next) => {
             }
         }
     } catch {
-        res.status(401).send({res: "fail"})
+        res.status(401).send({sign: "error", msg: "אירעה שגיאה"})
     }
 }
 
@@ -95,19 +95,20 @@ export const checkCookie = async (req, res, next)=> {
         } else res.send(false)
     } catch {
         console.log("Filed to check for cookies")
+        res.send(false)
     }
 }
 
 export const forgotPassword = async (req, res, next) => {
     try{
         const user = await Request.getUser("email", req.body.email);
-        if (!user) res.status(201).send({res: "wrong"}); //This email is not exist in the system
+        if (!user) res.status(201).send({sign: "warning", msg: "משתמש לא מוכר"});
         else {
             sendMail( user.email, "reset-password" , encrypt(user.id) , true )
             next();
         }
     } catch{
-        console.log({res: "fail"})
+        console.log({sign: "error", msg: "אירעה שגיאה"})
     }
 }
 
@@ -119,13 +120,13 @@ export const changePassword = async (req, user)=> {
 export const resetPassword = async (req, res, next)=> {
     try{
         const user = await Request.getUser("id", decrypt(req.params.id))
-        if (!user) res.status(201).send({res: "wrong"}) //"User ID doesn't exist"
+        if (!user) res.status(201).send({sign: "error", msg: "אירעה שגיאה"})
         else{
             changePassword(req, user)
             next()
         }
     } catch {
-        res.status(201).send({res: "fail"}) //"User ID doesn't exist"
+        res.status(201).send({sign: "error", msg: "אירעה שגיאה"})
     }
 }
 
