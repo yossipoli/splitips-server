@@ -39,8 +39,7 @@ import { createTransport } from "nodemailer";
         </html>`,
     });
     
-    export const sendMail =  (sendTo, link, userId, forgot=false) => {
-    
+export const sendMail =  (sendTo, link, userId, forgot=false) => {
     transform.sendMail(details(sendTo, link, userId, forgot), (err) => {
         if (err) {
             console.log("Failed to send mail: ", err);
@@ -49,7 +48,6 @@ import { createTransport } from "nodemailer";
             console.log("Email has sent successfully!");
         }
     });
-
 }
         
         

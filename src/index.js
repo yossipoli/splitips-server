@@ -50,7 +50,7 @@ app.post('/register', MW.register,  (req, res)=> {
 })
 
 app.get('/activate/:id', MW.activation, (req,res)=> {
-    res.send("Active!")
+    res.send("Activated!")
 })
 
 app.post('/login', MW.login , (req, res)=>{
@@ -71,9 +71,7 @@ app.post('/forgot-password/', MW.forgotPassword, (req, res)=>{
     res.send({res: "success"})
 })
 
-//need to send link for the web page with new password input
 app.post('/reset-password/:id', MW.resetPassword, (req, res)=>{
-    console.log("reset");
     res.send({res: "success"})
 })
 
