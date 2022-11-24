@@ -117,7 +117,6 @@ export const changePassword = async (req, user)=> {
 }
 
 export const resetPassword = async (req, res, next)=> {
-    console.log(req.params.id);
     const user = await Request.getUser("id", decrypt(req.params.id))
     if (!user) res.status(201).send({res: "wrong"}) //"User ID doesn't exist"
     else{
