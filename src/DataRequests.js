@@ -92,6 +92,7 @@ export const getDays = (userId, startDate, endDate = startDate)=> {
 }
 
 export const getEmployeePaycheck = (userId, employeeName, startDate, endDate = startDate)=> {
+    console.log(userId, employeeName, startDate, endDate);
     return new Promise((resolve, reject)=>{
             con.query(`call splitips.show_employee_in_period(?, ?, ?, ?);`, [userId, startDate, endDate, employeeName] , (error, data)=>{
             if (error){

@@ -141,7 +141,7 @@ export const resetPassword = async (req, res, next)=> {
         req.jobDays = data
         next()
     } catch {
-        res.status(401).send("Did NOT get respond for date dates.")
+        res.status(401).send(null) //Did NOT get respond for date dates.
     }
 }
 
@@ -151,7 +151,7 @@ export const getPaycheck = async (req, res, next) => {
         req.paycheck = data
         next()
     } catch {
-        res.status(401).send("Did NOT get respond for paycheck.")
+        res.status(401).send(null) //Did NOT get respond for paycheck.
     }
 }
 
@@ -184,7 +184,7 @@ const inputCheck = (values) => {
         return false
     }
 
-    if (typeof tookTip !== 'number'){
+    if ( tookTip !== 0 || tookTip !== 1){
         console.log("tipTook isn't a boolean number (0/1)");
         return false
     }
