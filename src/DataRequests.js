@@ -8,6 +8,7 @@ export const con = createConnection({
     user: process.env.DB_USERNAME,
     password: process.env.PASSWORD,
     database: process.env.DB,
+    dateStrings: true
 });
 
 con.connect((err) =>
@@ -63,6 +64,15 @@ export const set = (table, parameter, parameterValue, fieldToChange, newValue)=>
 // export const insertData = (values)=> {
 //     con.query(`INSERT INTO jobs VALUES (?);`, [values])
 // }
+    
+export const changeTookTip = (userId, newValue, name, date)=> {
+    try{
+        con.query(`UPDATE jobs SET took_tip = ? WHERE (user_id = ? and name = ? and date= ?);`,[newValue, userId, name, date])
+        return true
+    } catch {
+        return false
+    }
+}
 
 export const getData = (userId)=> {
     return new Promise((resolve, reject)=>{

@@ -137,11 +137,20 @@ export const resetPassword = async (req, res, next)=> {
 
   export const getPayDate = async (req, res, next) => {
     try {
-        const data = await Request.getDays(decrypt(req.cookies.user), req.body.startDate, req.body.endDate)
+        const data = await Request.getDays(decrypt(req.cookies.user), req.body.first, req.body.last)
         req.jobDays = data
         next()
     } catch {
         res.status(401).send(null) //Did NOT get respond for date dates.
+    }
+}
+
+export const changeTookTip = async (req, res, next) => {
+    try{
+        Request.changeTookTip(decrypt(req.cookies.user), req.body.tookTip, req.body.name , req.body.date)? next() : res.send(false)
+    }
+    catch{
+        res.status(401).send(false)
     }
 }
 

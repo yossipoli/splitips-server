@@ -88,6 +88,10 @@ app.post('/days', MW.getPayDate, (req, res)=> {
     res.send(req.jobDays)
 })
 
+app.post('/change-took-tip', MW.changeTookTip, (req, res)=> {
+    res.send(true)
+})
+
 app.post('/paycheck', MW.getPaycheck, (req, res)=> {
     res.send(req.paycheck)
 })
