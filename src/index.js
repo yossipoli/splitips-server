@@ -96,8 +96,12 @@ app.post('/paycheck', MW.getPaycheck, (req, res)=> {
     res.send(req.paycheck)
 })
 
-app.post('/add', MW.addJob, (req, res)=> {
+app.post('/add', MW.addJobDay, (req, res)=> {
     res.send({sign: "info", msg: "המידע נשמר"})
+})
+
+app.post('/remove', MW.removeDate, (req, res)=> {
+    res.send({sign: "info", msg: "המידע עבור יום עבודה זה הוסר"})
 })
 
 //////////////////////////////////////////////////////////////////////

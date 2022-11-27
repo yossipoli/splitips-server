@@ -164,20 +164,36 @@ export const getPaycheck = async (req, res, next) => {
     }
 }
 
-export const addJob = async (req, res, next) => {
+export const addJobDay = async (req, res, next) => {
     try{
-        if (!inputCheck(req.body)) res.send("Inputs not right")
-        const {date, name, start, end, hours, minimum, salary, tip, expense, tookTip} = req.body
-        const respond = await Request.addJob([decrypt(req.cookies.user), date, name, start, end, hours, minimum, salary, tip, expense, tookTip])
-        if (!respond) res.send("Request failed to insert a new Job.")
+        for (const job of req.body.employees){
+            if (!inputCheck(job)) res.send({sign: "warning", msg:"נתונים אינם תקינים"}) //Inputs not right
+            const {date, name, start, end, hours, minimum, perHour, salary, tip, expense, tookTip} = job
+            const respond = await Request.addJob([decrypt(req.cookies.user), date, name, start, end, hours, minimum, perHour, salary, tip, expense, tookTip])
+            if (!respond) res.send({sign: "error", msg: "אירעה שגיאה"}) //Request failed to insert a new Job
+        }
         next()
     } catch {
-        res.status(401).send("Failed to insert a new Job.")
+        res.status(401).send({sign: "error", msg: "אירעה שגיאה"}) //Failed to insert a new Job
     }
 }
 
+// export const addJob = async (req, res, next) => {
+//     try{
+//         if (!inputCheck(req.body)) res.send({sign: "warning", msg:"נתונים אינם תקינים"}) //Inputs not right
+//         const {date, name, start, end, hours, minimum, salary, tip, expense, tookTip} = req.body
+//         const respond = await Request.addJob([decrypt(req.cookies.user), date, name, start, end, hours, minimum, salary, tip, expense, tookTip])
+//         if (!respond) res.send({sign: "error", msg: "אירעה שגיאה"}) //Request failed to insert a new Job
+//         next()
+//     } catch {
+//         res.status(401).send({sign: "error", msg: "אירעה שגיאה"}) //Failed to insert a new Job
+//     }
+// }
+
+
 const inputCheck = (values) => {
-    const {date, start, end, hours, minimum, salary, tip, expense, tookTip} = values
+    const {date, start, end, hours, minimum, perHour, salary, tip, expense, tookTip} = values
+    // date = date.split('/').reverse().join('-')
 
     const dateRegex = /\d{4}-\d{2}-\d{2}/
 
@@ -193,19 +209,19 @@ const inputCheck = (values) => {
         return false
     }
 
-    if ( tookTip !== 0 || tookTip !== 1){
+    if ( tookTip !== 0 && tookTip !== 1){
         console.log("tipTook isn't a boolean number (0/1)");
         return false
     }
 
-    if (typeof hours !== 'number' || typeof minimum !== 'number' || typeof salary !== 'number' || typeof tip !== 'number' || typeof expense !== 'number'){
+    if (typeof hours !== 'number' || typeof minimum !== 'number' || typeof salary !== 'number' || typeof tip !== 'number' || typeof expense !== 'number' || typeof perHour !== 'number'){
         console.log("wrong type");
         return false
     }
 
     const [year, month, day] = date.split("-")
 
-    if (+month<1 || +month>10){
+    if (+month<1 || +month>12){
         console.log("wrong date input");
         return false
     }
@@ -215,7 +231,7 @@ const inputCheck = (values) => {
         return false
     }
 
-    if (+year<2000 || +year>2200) {
+    if (+year<2000 || +year>2100) {
         console.log("wrong date input");
         return false
     }
@@ -229,4 +245,14 @@ const inputCheck = (values) => {
     }
 
     return true
+}
+
+export const removeDate = async (req, res, next) => {
+    try{
+        const respond = await Request.removeDate(decrypt(req.cookies.user), req.body.date)
+        if (!respond) res.send({sign: "error", msg: "אירעה שגיאה"}) //Request failed to remove date
+        next()
+    } catch {
+        res.status(401).send({sign: "error", msg: "אירעה שגיאה"}) //Failed to remove date
+    }
 }

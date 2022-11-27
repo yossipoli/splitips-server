@@ -47,7 +47,8 @@ export const register = (email, password) => {
     return new Promise((resolve, reject) => {
         con.query(`INSERT INTO users VALUES (default, ?, ?, 0)`, [email, password], (err) => {
             if (err) {
-                reject(err);
+                console.log("Failed to insert a new user", err);
+                reject(false);
             } else {
                 resolve(true);
             }
@@ -118,9 +119,10 @@ export const getEmployeePaycheck = (userId, employeeName, startDate, endDate = s
 
 export const addJob = (values)=> {
     return new Promise((resolve, reject) => {
-        con.query(`INSERT INTO jobs VALUES (default, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, values, (err) => {
+        con.query(`INSERT INTO jobs VALUES (default, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, values, (err) => {
             if (err) {
-                reject("addJob DataRequest failed", err);
+                console.log("addJob DataRequest failed", err);
+                reject(false);
             } else {
                 resolve(true);
             }
@@ -132,7 +134,21 @@ export const removeJob = (id) => {
     return new Promise((resolve, reject) => {
         con.query(`DELETE FROM jobs WHERE (id = ?);`, [id], (err) => {
             if (err) {
-                reject("addJob DataRequest failed", err);
+                console.log("Remove a job from DataRequest is failed", err);
+                reject(false);
+            } else {
+                resolve(true);
+            }
+        });
+    });
+}
+
+export const removeDate = (userId, date) => {
+    return new Promise((resolve, reject) => {
+        con.query(`DELETE FROM jobs WHERE (user_id = ? and date =?);`, [userId, date], (err) => {
+            if (err) {
+                console.log("Remove a date failed in DataRequest", err);
+                reject(false);
             } else {
                 resolve(true);
             }
