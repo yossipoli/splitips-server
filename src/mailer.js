@@ -13,7 +13,7 @@ import { createTransport } from "nodemailer";
             },
         });
         
-    let details = (sendTo, link, userId)=> ({
+    let details = (sendTo, link, userId, forgot)=> ({
         from: process.env.EMAIL_USER,
         to: [sendTo],
         subject: "Welcome to Tip$pliT",
@@ -33,23 +33,21 @@ import { createTransport } from "nodemailer";
             The easy way for manage the waiters salary and tips.
             </div>
             <div>
-                Click <a href="http://localhost:${process.env.SERVER_PORT}/${link}/${userId}">here</a> for activate your account.
+                Click <a href="http://localhost:${forgot ? 3000 : process.env.SERVER_PORT}/${link}/${userId}">here</a> for activate your account.
             </div>
         </body>
         </html>`,
     });
     
-    export const sendMail =  (sendTo, link, userId) => {
-    
-    transform.sendMail(details(sendTo, link, userId), (err) => {
+export const sendMail =  (sendTo, link, userId, forgot=false) => {
+    transform.sendMail(details(sendTo, link, userId, forgot), (err) => {
         if (err) {
             console.log("Failed to send mail: ", err);
         }
         else {
-            console.log("email has sent!");
+            console.log("Email has sent successfully!");
         }
     });
-
 }
         
         

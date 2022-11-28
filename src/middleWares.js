@@ -40,17 +40,17 @@ export const getUser = async (req, res, next) => {
 export const register = async (req, res, next) => {
     try {
         let user = await Request.getUser("email", req.body.email)
-        if (user) res.send("This Email already assign")
+        if (user) res.send({sign: "warning", msg: "כתובת אימייל זו כבר רשומה במערכת"})
         else {
-            await Request.register(req.body.email, await hash(req.body.password))
-            res.cookie("user", encrypt(user.id), {maxAge: YEAR})
+            const respond = await Request.register(req.body.email, await hash(req.body.password))
+            if (!respond) res.send({sign: "error", msg: "אירעה שגיאה"})
             user = await Request.getUser("email", req.body.email)
-
             sendMail(user.email, "activate" , encrypt(user.id))
+            res.cookie("user", encrypt(user.id), {maxAge: YEAR})
             next()
         }
     } catch {
-        res.status(401).send("Failed to register.")
+        res.status(401).send({sign: "error", msg: "אירעה שגיאה"})
     }
 }
 
@@ -66,48 +66,50 @@ export const activation = async (req, res, next) => {
 export const login = async (req, res, next) => {
     try {
         const user = await Request.getUser("email", req.body.email);
-        if (!user) res.status(201).send("email or password is incorrect");
+        if (!user) res.status(201).send({sign: "warning", msg: "אימייל או סיסמה לא נכונים"});
         else {
             if (! await compare(req.body.password, user.password)){
-                res.status(201).send("email or password is incorrect");
+                res.status(201).send({sign: "warning", msg: "אימייל או סיסמה לא נכונים"});
             }
             else {
-                res.cookie("user", encrypt(user.id), {maxAge: YEAR})
-                next();
+                if (+user.activate !== 1) res.send({sign: "info", msg: "יש לאשר חשבון באמצעות הקישור הנשלח למיייל"})
+                else{
+                    res.cookie("user", encrypt(user.id), {maxAge: YEAR})
+                    next();
+                }
             }
         }
     } catch {
-        res.status(401).send("Failed to login.")
+        res.status(401).send({sign: "error", msg: "אירעה שגיאה"})
     }
 }
 
 export const checkCookie = async (req, res, next)=> {
     try {
-        if (req.cookies.sessionCookie){
-            next()
-        } else if(req.cookies.user){
+        if(req.cookies.user){
             const user = await Request.getUser("id", decrypt(req.cookies.user))
-            if (!user) res.send(false);
+            if (+user.activate !== 1) res.send({res: false});
             else {
                 req.session.user = {id: encrypt(user.id)}
                 next()
             }
-        } else res.send(false)
+        } else res.send({res: false})
     } catch {
         console.log("Filed to check for cookies")
+        res.send({res: false})
     }
 }
 
 export const forgotPassword = async (req, res, next) => {
     try{
         const user = await Request.getUser("email", req.body.email);
-        if (!user) res.status(201).send("This email is not exist in the system");
+        if (!user) res.status(201).send({sign: "warning", msg: "משתמש לא מוכר"});
         else {
-            sendMail( user.email, "reset-password" , encrypt(user.id) )
+            sendMail( user.email, "reset-password" , encrypt(user.id) , true )
             next();
         }
     } catch{
-        console.log("Failed to get user")
+        console.log({sign: "error", msg: "אירעה שגיאה"})
     }
 }
 
@@ -117,11 +119,15 @@ export const changePassword = async (req, user)=> {
 }
 
 export const resetPassword = async (req, res, next)=> {
-    const user = await Request.getUser("id", decrypt(req.params.id))
-    if (!user) res.status(201).send("User ID doesn't exist")
-    else{
-        changePassword(req, user)
-        next()
+    try{
+        const user = await Request.getUser("id", decrypt(req.params.id))
+        if (!user) res.status(201).send({sign: "error", msg: "אירעה שגיאה"})
+        else{
+            changePassword(req, user)
+            next()
+        }
+    } catch {
+        res.status(201).send({sign: "error", msg: "אירעה שגיאה"})
     }
 }
 
@@ -132,11 +138,20 @@ export const resetPassword = async (req, res, next)=> {
 
   export const getPayDate = async (req, res, next) => {
     try {
-        const data = await Request.getDays(decrypt(req.cookies.user), req.body.startDate, req.body.endDate)
+        const data = await Request.getDays(decrypt(req.cookies.user), req.body.first, req.body.last)
         req.jobDays = data
         next()
     } catch {
-        res.status(401).send("Did NOT get respond for date dates.")
+        res.status(401).send(null) //Did NOT get respond for date dates.
+    }
+}
+
+export const changeTookTip = async (req, res, next) => {
+    try{
+        Request.changeTookTip(decrypt(req.cookies.user), req.body.tookTip, req.body.name , req.body.date)? next() : res.send(false)
+    }
+    catch{
+        res.status(401).send(false)
     }
 }
 
@@ -146,24 +161,40 @@ export const getPaycheck = async (req, res, next) => {
         req.paycheck = data
         next()
     } catch {
-        res.status(401).send("Did NOT get respond for paycheck.")
+        res.status(401).send(null) //Did NOT get respond for paycheck.
     }
 }
 
-export const addJob = async (req, res, next) => {
+export const addJobDay = async (req, res, next) => {
     try{
-        if (!inputCheck(req.body)) res.send("Inputs not right")
-        const {date, name, start, end, hours, minimum, salary, tip, expense, tookTip} = req.body
-        const respond = await Request.addJob([decrypt(req.cookies.user), date, name, start, end, hours, minimum, salary, tip, expense, tookTip])
-        if (!respond) res.send("Request failed to insert a new Job.")
+        for (const job of req.body.employees){
+            if (!inputCheck(job)) res.send({sign: "warning", msg:"נתונים אינם תקינים"}) //Inputs not right
+            const {date, name, start, end, hours, minimum, perHour, salary, tip, expense, tookTip} = job
+            const respond = await Request.addJob([decrypt(req.cookies.user), date, name, start, end, hours, minimum, perHour, salary, tip, expense, tookTip])
+            if (!respond) res.send({sign: "error", msg: "אירעה שגיאה"}) //Request failed to insert a new Job
+        }
         next()
     } catch {
-        res.status(401).send("Failed to insert a new Job.")
+        res.status(401).send({sign: "error", msg: "אירעה שגיאה"}) //Failed to insert a new Job
     }
 }
 
+// export const addJob = async (req, res, next) => {
+//     try{
+//         if (!inputCheck(req.body)) res.send({sign: "warning", msg:"נתונים אינם תקינים"}) //Inputs not right
+//         const {date, name, start, end, hours, minimum, salary, tip, expense, tookTip} = req.body
+//         const respond = await Request.addJob([decrypt(req.cookies.user), date, name, start, end, hours, minimum, salary, tip, expense, tookTip])
+//         if (!respond) res.send({sign: "error", msg: "אירעה שגיאה"}) //Request failed to insert a new Job
+//         next()
+//     } catch {
+//         res.status(401).send({sign: "error", msg: "אירעה שגיאה"}) //Failed to insert a new Job
+//     }
+// }
+
+
 const inputCheck = (values) => {
-    const {date, start, end, hours, minimum, salary, tip, expense, tookTip} = values
+    const {date, start, end, hours, minimum, perHour, salary, tip, expense, tookTip} = values
+    // date = date.split('/').reverse().join('-')
 
     const dateRegex = /\d{4}-\d{2}-\d{2}/
 
@@ -179,19 +210,19 @@ const inputCheck = (values) => {
         return false
     }
 
-    if (typeof tookTip !== 'number'){
+    if ( tookTip !== 0 && tookTip !== 1){
         console.log("tipTook isn't a boolean number (0/1)");
         return false
     }
 
-    if (typeof hours !== 'number' || typeof minimum !== 'number' || typeof salary !== 'number' || typeof tip !== 'number' || typeof expense !== 'number'){
+    if (typeof hours !== 'number' || typeof minimum !== 'number' || typeof salary !== 'number' || typeof tip !== 'number' || typeof expense !== 'number' || typeof perHour !== 'number'){
         console.log("wrong type");
         return false
     }
 
     const [year, month, day] = date.split("-")
 
-    if (+month<1 || +month>10){
+    if (+month<1 || +month>12){
         console.log("wrong date input");
         return false
     }
@@ -201,7 +232,7 @@ const inputCheck = (values) => {
         return false
     }
 
-    if (+year<2000 || +year>2200) {
+    if (+year<2000 || +year>2100) {
         console.log("wrong date input");
         return false
     }
@@ -215,4 +246,14 @@ const inputCheck = (values) => {
     }
 
     return true
+}
+
+export const removeDate = async (req, res, next) => {
+    try{
+        const respond = await Request.removeDate(decrypt(req.cookies.user), req.body.date)
+        if (!respond) res.send({sign: "error", msg: "אירעה שגיאה"}) //Request failed to remove date
+        next()
+    } catch {
+        res.status(401).send({sign: "error", msg: "אירעה שגיאה"}) //Failed to remove date
+    }
 }
