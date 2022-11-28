@@ -72,8 +72,11 @@ export const login = async (req, res, next) => {
                 res.status(201).send({sign: "warning", msg: "אימייל או סיסמה לא נכונים"});
             }
             else {
-                res.cookie("user", encrypt(user.id), {maxAge: YEAR})
-                next();
+                if (+user.activate !== 1) res.send({sign: "info", msg: "יש לאשר חשבון באמצעות הקישור הנשלח למיייל"})
+                else{
+                    res.cookie("user", encrypt(user.id), {maxAge: YEAR})
+                    next();
+                }
             }
         }
     } catch {
@@ -83,19 +86,17 @@ export const login = async (req, res, next) => {
 
 export const checkCookie = async (req, res, next)=> {
     try {
-        if (req.cookies.sessionCookie){
-            next()
-        } else if(req.cookies.user){
+        if(req.cookies.user){
             const user = await Request.getUser("id", decrypt(req.cookies.user))
-            if (!user) res.send(false);
+            if (+user.activate !== 1) res.send({res: false});
             else {
                 req.session.user = {id: encrypt(user.id)}
                 next()
             }
-        } else res.send(false)
+        } else res.send({res: false})
     } catch {
         console.log("Filed to check for cookies")
-        res.send(false)
+        res.send({res: false})
     }
 }
 

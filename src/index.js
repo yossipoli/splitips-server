@@ -50,11 +50,30 @@ app.post('/user', MW.getUser, (req, res)=> {
 })
 
 app.post('/register', MW.register,  (req, res)=> {
-    res.send({sign: "success", msg: "נרשמת למערכת בהצלחה"})
+    res.send({sign: "success", msg: "נרשמת למערכת בהצלחה, יש לאשר חשבון באמצעות קישור הנשלח לכתובת המייל שלך"})
 })
 
 app.get('/activate/:id', MW.activation, (req,res)=> {
-    res.send("Activated!")
+    res.send(/*html*/`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8" />
+            <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+            <title>Tip$plit</title>
+        </head>
+        <body>
+            <header>
+                <img src="/logoTitle.png" alt="Tip Split" />
+            </header>
+            <h3>הפעלת החשבון בוצעה בהצלחה</h3>
+            <h3>
+                <a href="http://localhost:3000/">לחץ כאן למעבר לאתר</a>
+            </h3>
+        </body>
+        </html>
+    `)
 })
 
 app.post('/login', MW.login , (req, res)=>{
@@ -62,13 +81,13 @@ app.post('/login', MW.login , (req, res)=>{
 })
 
 app.get('/check-cookie', MW.checkCookie , (req, res)=>{
-    res.send(true)
+    res.send({res: true})
 })
 
 app.get("/logout", (req, res) => {
     res.clearCookie("sessionCookie");
     res.clearCookie("user");
-    res.send(`logout has successful!`);
+    res.send();
 });
 
 app.post('/forgot-password/', MW.forgotPassword, (req, res)=>{
@@ -108,7 +127,7 @@ app.post('/remove', MW.removeDate, (req, res)=> {
 /////////////////////////////// others ///////////////////////////////
 //////////////////////////////////////////////////////////////////////
 
-app.get('./logoTitle.png', (req, res) => {
+app.get('/logoTitle.png', (req, res) => {
     readFile(__dirname +'/imgs/logoTitle.png', { 'content-type': 'image/png' } , (e, img) => {
         if (e) {
             res.send('TipSplit');
