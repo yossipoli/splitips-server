@@ -127,14 +127,14 @@ app.post('/remove', MW.removeDate, (req, res)=> {
 /////////////////////////////// others ///////////////////////////////
 //////////////////////////////////////////////////////////////////////
 
-app.get('/logoTitle.png', (req, res) => {
-    readFile(__dirname +'/imgs/logoTitle.png', { 'content-type': 'image/png' } , (e, img) => {
-        if (e) {
-            res.send('TipSplit');
-        } else {
-            res.send(img);
-        }
-    })
-});
+// app.get('/logoTitle.png', (req, res) => {
+//     readFile(__dirname +'/imgs/logoTitle.png', { 'content-type': 'image/png' } , (e, img) => {
+//         if (e) {
+//             res.send('TipSplit');
+//         } else {
+//             res.send(img);
+//         }
+//     })
+// });
 
-app.listen(PORT, () => console.log(`Server is UP!🚀`));
+app.listen(433, () => console.log(`Server is UP!🚀`));
