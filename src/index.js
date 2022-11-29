@@ -20,7 +20,7 @@ const app = express();
 
 const corsOptions = {
     credentials: true,
-	origin: ['http://localhost:3000', 'https://tipsplit-server.cyclic.app'],
+	origin: ['http://localhost:3000', 'https://splitips.netlify.app'],
 	optionsSuccessStatus: 200
 };
 
