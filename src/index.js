@@ -137,4 +137,8 @@ app.post('/remove', MW.removeDate, (req, res)=> {
 //     })
 // });
 
+app.get("/", (req, res) => {
+    res.send("Hello Uria");
+});
+
 app.listen(PORT, () => console.log(`Server is UP!🚀`));
