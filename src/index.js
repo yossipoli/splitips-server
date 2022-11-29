@@ -69,7 +69,7 @@ app.get('/activate/:id', MW.activation, (req,res)=> {
             </header>
             <h3>הפעלת החשבון בוצעה בהצלחה</h3>
             <h3>
-                <a href="http://localhost:3000/">לחץ כאן למעבר לאתר</a>
+                <a href="http://spitips.netlify.app/">לחץ כאן למעבר לאתר</a>
             </h3>
         </body>
         </html>
