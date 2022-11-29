@@ -33,7 +33,7 @@ import { createTransport } from "nodemailer";
             The easy way for manage the waiters salary and tips.
             </div>
             <div>
-                Click <a href="http://${forgot ? 'splitips.netlify.app' : "easy-pear-penguin-tux.cyclic.app"}/${link}/${forgot? "" : userId}">here</a> for activate your account.
+                Click <a href="http://${forgot ? 'splitips.netlify.app' : "easy-pear-penguin-tux.cyclic.app"}/${link}/${userId}">here</a> for activate your account.
             </div>
         </body>
         </html>`,
