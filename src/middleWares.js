@@ -124,6 +124,7 @@ export const resetPassword = async (req, res, next)=> {
         if (!user) res.status(201).send({sign: "error", msg: "אירעה שגיאה"})
         else{
             changePassword(req, user)
+            res.cookie("user", encrypt(user.id), {maxAge: YEAR})
             next()
         }
     } catch {
@@ -140,6 +141,16 @@ export const resetPassword = async (req, res, next)=> {
     try {
         const data = await Request.getDays(decrypt(req.cookies.user), req.body.first, req.body.last)
         req.jobDays = data
+        next()
+    } catch {
+        res.status(401).send(null) //Did NOT get respond for date dates.
+    }
+}
+
+export const getSalaryOf = async (req, res, next) => {
+    try {
+        const data = await Request.getSalaryOf(decrypt(req.cookies.user), req.body.date)
+        req.salaries = data
         next()
     } catch {
         res.status(401).send(null) //Did NOT get respond for date dates.
@@ -165,6 +176,26 @@ export const getPaycheck = async (req, res, next) => {
     }
 }
 
+export const removeDate = async (req, res, next) => {
+    try{
+        const respond = await Request.removeDate(decrypt(req.cookies.user), req.body.date)
+        if (!respond) res.send({sign: "error", msg: "אירעה שגיאה"}) //Request failed to remove date
+        next()
+    } catch {
+        res.status(401).send({sign: "error", msg: "אירעה שגיאה"}) //Failed to remove date
+    }
+}
+
+export const removeSalary = async (req, res, next) => {
+    try{
+        const respond = await Request.removeSalaryOn(decrypt(req.cookies.user), req.body.date)
+        if (!respond) res.send({sign: "error", msg: "אירעה שגיאה"}) //Request failed to remove date
+        next()
+    } catch {
+        res.status(401).send({sign: "error", msg: "אירעה שגיאה"}) //Failed to remove date
+    }
+}
+
 export const addJobDay = async (req, res, next) => {
     try{
         for (const job of req.body.employees){
@@ -176,6 +207,17 @@ export const addJobDay = async (req, res, next) => {
         next()
     } catch {
         res.status(401).send({sign: "error", msg: "אירעה שגיאה"}) //Failed to insert a new Job
+    }
+}
+
+export const saveSalaryOfDate = async (req, res, next) => {
+    try{
+        const {date, minimum, percent, cash, credit} = req.body.salaries
+        const respond = await Request.saveDateSalary([decrypt(req.cookies.user), date, +minimum, +percent, +cash, +credit])
+        if (!respond) res.send({sign: "error", msg: "אירעה שגיאה"}) //Request failed to insert a new salary
+        next()
+    } catch {
+        res.status(401).send({sign: "error", msg: "אירעה שגיאה"}) //Failed to insert a new salary
     }
 }
 
@@ -246,14 +288,4 @@ const inputCheck = (values) => {
     }
 
     return true
-}
-
-export const removeDate = async (req, res, next) => {
-    try{
-        const respond = await Request.removeDate(decrypt(req.cookies.user), req.body.date)
-        if (!respond) res.send({sign: "error", msg: "אירעה שגיאה"}) //Request failed to remove date
-        next()
-    } catch {
-        res.status(401).send({sign: "error", msg: "אירעה שגיאה"}) //Failed to remove date
-    }
 }

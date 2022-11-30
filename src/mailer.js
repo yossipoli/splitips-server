@@ -1,6 +1,11 @@
 import * as dotenv from "dotenv";
 dotenv.config();
 
+const X = 0
+const SERVER = ['easy-pear-penguin-tux.cyclic.app', 'localhost:4100'] //[0]: public, [1]:local
+const CLIENT = ['splitips.netlify.app', 'localhost:3000'] //[0]: public, [1]:local
+const HOST = [SERVER[X], CLIENT[X]]
+
 import { createTransport } from "nodemailer";
 
     const transform = createTransport({
@@ -33,7 +38,7 @@ import { createTransport } from "nodemailer";
             The easy way for manage the waiters salary and tips.
             </div>
             <div>
-                Click <a href="http://${forgot ? 'splitips.netlify.app' : "easy-pear-penguin-tux.cyclic.app"}/${link}/${userId}">here</a> for activate your account.
+                Click <a href="http://${forgot ? HOST[1] : HOST[0]}/${link}/${userId}">here</a> for activate your account.
             </div>
         </body>
         </html>`,

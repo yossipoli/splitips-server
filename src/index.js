@@ -12,7 +12,7 @@ import { readFile } from 'fs';
 
 const __dirname = path.resolve();
 
-const PORT = +process.env.SERVER_PORT;
+const PORT = process.env.SERVER_PORT;
 
 const YEAR = 1000*60*60*24*365
 
@@ -24,7 +24,8 @@ const corsOptions = {
 	optionsSuccessStatus: 200
 };
 
-app.use(cors(/*corsOptions*/));
+// app.use(cors());
+app.use(cors(corsOptions));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
@@ -65,11 +66,11 @@ app.get('/activate/:id', MW.activation, (req,res)=> {
         </head>
         <body>
             <header>
-                <img src="/logoTitle.png" alt="Tip Split" />
+                <img src="/logo" alt="Tip Split" />
             </header>
             <h3>הפעלת החשבון בוצעה בהצלחה</h3>
             <h3>
-                <a href="http://spitips.netlify.app/">לחץ כאן למעבר לאתר</a>
+                <a href="http://splitips.netlify.app/">לחץ כאן למעבר לאתר</a>
             </h3>
         </body>
         </html>
@@ -107,6 +108,14 @@ app.post('/days', MW.getPayDate, (req, res)=> {
     res.send(req.jobDays)
 })
 
+app.post('/salary-date', MW.getSalaryOf, (req, res)=> {
+    res.send(req.salaries)
+})
+
+app.post('/save-salary', MW.saveSalaryOfDate, (req, res)=> {
+    res.send({sign: "info", msg: "המידע נשמר"})
+})
+
 app.post('/change-took-tip', MW.changeTookTip, (req, res)=> {
     res.send(true)
 })
@@ -123,11 +132,15 @@ app.post('/remove', MW.removeDate, (req, res)=> {
     res.send({sign: "info", msg: "המידע עבור יום עבודה זה הוסר"})
 })
 
+app.post('/remove-salary', MW.removeSalary, (req, res)=> {
+    res.send({sign: "info", msg: "המידע עבור יום עבודה זה הוסר"})
+})
+
 //////////////////////////////////////////////////////////////////////
 /////////////////////////////// others ///////////////////////////////
 //////////////////////////////////////////////////////////////////////
 
-app.get('/logoTitle.png', (req, res) => {
+app.get('/logo', (req, res) => {
     readFile(__dirname +'/imgs/logoTitle.png', { 'content-type': 'image/png' } , (e, img) => {
         if (e) {
             res.send('TipSplit');

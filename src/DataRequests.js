@@ -99,7 +99,19 @@ export const getDays = (userId, startDate, endDate = startDate)=> {
             }
         })
     })
+}
 
+export const getSalaryOf = (userId, date)=> {
+    return new Promise((resolve, reject)=>{
+        con.query(`call get_day_salary_data(?, ?);`, [userId, date] , (error, data)=>{
+            if (error){
+                console.log(`Failed to get date data from DB at get salary date: \n${error}`);
+                reject(error)
+            } else {
+                resolve(data[0] || null)
+            }
+        })
+    })
 }
 
 export const getEmployeePaycheck = (userId, employeeName, startDate, endDate = startDate)=> {
@@ -116,6 +128,32 @@ export const getEmployeePaycheck = (userId, employeeName, startDate, endDate = s
     })
 }
 
+
+export const saveDateSalary = (values)=> {
+    return new Promise((resolve, reject) => {
+        con.query(`INSERT INTO salaries VALUES (default, ?, ?, ?, ?, ?, ?);`, values, (err) => {
+            if (err) {
+                console.log("salary DataRequest failed", err);
+                reject(false);
+            } else {
+                resolve(true);
+            }
+        });
+    });
+}
+
+export const removeSalaryOn = (userId, date) => {
+    return new Promise((resolve, reject) => {
+        con.query(`DELETE FROM salaries WHERE (user_id = ? AND date = ?);`, [userId, date], (err) => {
+            if (err) {
+                console.log("Remove a job from DataRequest is failed", err);
+                reject(false);
+            } else {
+                resolve(true);
+            }
+        });
+    });
+}
 
 export const addJob = (values)=> {
     return new Promise((resolve, reject) => {
