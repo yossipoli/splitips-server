@@ -20,12 +20,12 @@ const app = express();
 
 const corsOptions = {
     credentials: true,
-	origin: ['http://localhost:3000', 'https://splitips.netlify.app'],
+	origin: ['http://localhost:3000', 'https://splitips.netlify.app', 'tipsplit.click'],
 	optionsSuccessStatus: 200
 };
 
-// app.use(cors());
-app.use(cors(corsOptions));
+app.use(cors());
+// app.use(cors(corsOptions));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
