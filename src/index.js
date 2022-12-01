@@ -151,7 +151,7 @@ app.get('/logo', (req, res) => {
 });
 
 app.get("/", (req, res) => {
-    res.send("Hello Uria");
+    res.send("WELCOME to Tip$pliT!");
 });
 
 app.listen(PORT, () => console.log(`Server is UP!🚀`));
