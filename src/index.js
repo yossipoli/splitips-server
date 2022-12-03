@@ -12,7 +12,7 @@ import { readFile } from 'fs';
 
 const __dirname = path.resolve();
 
-const PORT = process.env.SERVER_PORT;
+const PORT = process.env.PORT;
 
 const YEAR = 1000*60*60*24*365
 
