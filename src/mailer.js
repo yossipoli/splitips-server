@@ -38,7 +38,7 @@ import { createTransport } from "nodemailer";
             The easy way for manage the waiters salary and tips.
             </div>
             <div>
-                Click <a href="https://${forgot ? HOST[1] : HOST[0]}/${link}/${userId}">here</a> for activate your account.
+                Click <a href="http://${forgot ? HOST[1] : HOST[0]}/${link}/${userId}">here</a> for activate your account.
             </div>
         </body>
         </html>`,
