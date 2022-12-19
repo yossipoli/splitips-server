@@ -37,7 +37,7 @@ export const getUser = (where, value) => {
             if (err) {
                 reject(err);
             } else {
-                resolve(data[0]);
+                resolve(data[0] || null);
             }
         });
     });

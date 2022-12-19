@@ -2,7 +2,7 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 const X = 0
-const SERVER = ['tipsplit-server.herokuapp.com', 'localhost:4100'] //[0]: public, [1]:local
+const SERVER = ['server2.tipsplit.click', 'localhost:4100'] //[0]: public, [1]:local
 const CLIENT = ['splitips.netlify.app', 'localhost:3000'] //[0]: public, [1]:local
 const HOST = [SERVER[X], CLIENT[X]]
 
