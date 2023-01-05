@@ -1,9 +1,9 @@
 import * as dotenv from "dotenv";
 dotenv.config();
 
-import { createConnection } from "mysql2";
+import mysql from "mysql2";
 
-export const con = createConnection({
+export const pool = mysql.createPool({
     host: process.env.HOST,
     user: process.env.DB_USERNAME,
     password: process.env.PASSWORD,
@@ -11,11 +11,11 @@ export const con = createConnection({
     dateStrings: true
 });
 
-con.connect((err) =>
-    err
-        ? console.log("Problem with DB:\n", err)
-        : console.log("connected to DB")
-);
+// con.connect((err) =>
+//     err
+//         ? console.log("Problem with DB:\n", err)
+//         : console.log("connected to DB")
+// );
 
 //users:
 
@@ -33,7 +33,7 @@ con.connect((err) =>
 
 export const getUser = (where, value) => {
     return new Promise((resolve, reject) => {
-        con.query(`SELECT * FROM users where (${where} = ?);`, [value], (err, data) => {
+        pool.query(`SELECT * FROM users where (${where} = ?);`, [value], (err, data) => {
             if (err) {
                 reject(err);
             } else {
@@ -45,7 +45,7 @@ export const getUser = (where, value) => {
 
 export const register = (email, password) => {
     return new Promise((resolve, reject) => {
-        con.query(`INSERT INTO users VALUES (default, ?, ?, 0)`, [email, password], (err) => {
+        pool.query(`INSERT INTO users VALUES (default, ?, ?, 0)`, [email, password], (err) => {
             if (err) {
                 console.log("Failed to insert a new user", err);
                 reject(false);
@@ -57,18 +57,18 @@ export const register = (email, password) => {
 };
 
 export const set = (table, parameter, parameterValue, fieldToChange, newValue)=> {
-    con.query(`UPDATE ${table} SET ${fieldToChange} = ? WHERE (${parameter} = ?);`,[newValue, parameterValue])
+    pool.query(`UPDATE ${table} SET ${fieldToChange} = ? WHERE (${parameter} = ?);`,[newValue, parameterValue])
 }
 
 //jobs:
 
 // export const insertData = (values)=> {
-//     con.query(`INSERT INTO jobs VALUES (?);`, [values])
+//     pool.query(`INSERT INTO jobs VALUES (?);`, [values])
 // }
     
 export const changeTookTip = (userId, newValue, name, date)=> {
     try{
-        con.query(`UPDATE jobs SET took_tip = ? WHERE (user_id = ? and name = ? and date= ?);`,[newValue, userId, name, date])
+        pool.query(`UPDATE jobs SET took_tip = ? WHERE (user_id = ? and name = ? and date= ?);`,[newValue, userId, name, date])
         return true
     } catch {
         return false
@@ -77,7 +77,7 @@ export const changeTookTip = (userId, newValue, name, date)=> {
 
 export const getData = (userId)=> {
     return new Promise((resolve, reject)=>{
-        con.query(`SELECT * FROM jobs WHERE (user_id = ?);`, [userId] , (error, data)=>{
+        pool.query(`SELECT * FROM jobs WHERE (user_id = ?);`, [userId] , (error, data)=>{
             if (error){
                 console.log(`Failed to get data from DB: \n${error}`);
                 reject(error)
@@ -90,7 +90,7 @@ export const getData = (userId)=> {
 
 export const getDays = (userId, startDate, endDate = startDate)=> {
     return new Promise((resolve, reject)=>{
-        con.query(`call show_days(?, ?, ?);`, [userId, startDate, endDate] , (error, data)=>{
+        pool.query(`call show_days(?, ?, ?);`, [userId, startDate, endDate] , (error, data)=>{
             if (error){
                 console.log(`Failed to get date data from DB: \n${error}`);
                 reject(error)
@@ -103,7 +103,7 @@ export const getDays = (userId, startDate, endDate = startDate)=> {
 
 export const getSalaryOf = (userId, date)=> {
     return new Promise((resolve, reject)=>{
-        con.query(`call get_day_salary_data(?, ?);`, [userId, date] , (error, data)=>{
+        pool.query(`call get_day_salary_data(?, ?);`, [userId, date] , (error, data)=>{
             if (error){
                 console.log(`Failed to get date data from DB at get salary date: \n${error}`);
                 reject(error)
@@ -117,7 +117,7 @@ export const getSalaryOf = (userId, date)=> {
 export const getEmployeePaycheck = (userId, employeeName, startDate, endDate = startDate)=> {
     console.log(userId, employeeName, startDate, endDate);
     return new Promise((resolve, reject)=>{
-            con.query(`call splitips.show_employee_in_period(?, ?, ?, ?);`, [userId, startDate, endDate, employeeName] , (error, data)=>{
+            pool.query(`call splitips.show_employee_in_period(?, ?, ?, ?);`, [userId, startDate, endDate, employeeName] , (error, data)=>{
             if (error){
                 console.log(`Failed to get employee paycheck from DB: \n${error}`);
                 reject(error)
@@ -131,7 +131,7 @@ export const getEmployeePaycheck = (userId, employeeName, startDate, endDate = s
 
 export const saveDateSalary = (values)=> {
     return new Promise((resolve, reject) => {
-        con.query(`INSERT INTO salaries VALUES (default, ?, ?, ?, ?, ?, ?);`, values, (err) => {
+        pool.query(`INSERT INTO salaries VALUES (default, ?, ?, ?, ?, ?, ?);`, values, (err) => {
             if (err) {
                 console.log("salary DataRequest failed", err);
                 reject(false);
@@ -144,7 +144,7 @@ export const saveDateSalary = (values)=> {
 
 export const removeSalaryOn = (userId, date) => {
     return new Promise((resolve, reject) => {
-        con.query(`DELETE FROM salaries WHERE (user_id = ? AND date = ?);`, [userId, date], (err) => {
+        pool.query(`DELETE FROM salaries WHERE (user_id = ? AND date = ?);`, [userId, date], (err) => {
             if (err) {
                 console.log("Remove a job from DataRequest is failed", err);
                 reject(false);
@@ -157,7 +157,7 @@ export const removeSalaryOn = (userId, date) => {
 
 export const addJob = (values)=> {
     return new Promise((resolve, reject) => {
-        con.query(`INSERT INTO jobs VALUES (default, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, values, (err) => {
+        pool.query(`INSERT INTO jobs VALUES (default, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, values, (err) => {
             if (err) {
                 console.log("addJob DataRequest failed", err);
                 reject(false);
@@ -170,7 +170,7 @@ export const addJob = (values)=> {
 
 export const removeJob = (id) => {
     return new Promise((resolve, reject) => {
-        con.query(`DELETE FROM jobs WHERE (id = ?);`, [id], (err) => {
+        pool.query(`DELETE FROM jobs WHERE (id = ?);`, [id], (err) => {
             if (err) {
                 console.log("Remove a job from DataRequest is failed", err);
                 reject(false);
@@ -183,7 +183,7 @@ export const removeJob = (id) => {
 
 export const removeDate = (userId, date) => {
     return new Promise((resolve, reject) => {
-        con.query(`DELETE FROM jobs WHERE (user_id = ? and date =?);`, [userId, date], (err) => {
+        pool.query(`DELETE FROM jobs WHERE (user_id = ? and date =?);`, [userId, date], (err) => {
             if (err) {
                 console.log("Remove a date failed in DataRequest", err);
                 reject(false);
